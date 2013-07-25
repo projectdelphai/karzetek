@@ -83,4 +83,4 @@ class Karzetek:
     for a in soup.findAll('link', {'rel' : 'alternate'}, href=True, type=True ):
       if a['rel'] == ['alternate'] and a['href'].startswith('http'):
         return { "title": ' '.join(soup.title.text.split()), "url": url, "feed": a['href'] }
-    return { "title": ' '.join(soup.title.text.split()), "url": url, "feed": None }
+    return { "title": None, "url": url, "feed": None }
