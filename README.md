@@ -18,15 +18,34 @@ If you want to install this service for personal use:
 
 It is recommended that you install this all under a virtualenv folder.
 
-Usage
+You will also need some sort of postgres database.
+
+Using the API
 -----------------
 The API itself is hosted on karzetek.heroku.com. To get recommendations, the format is as follows:
 
     karzetek.heroku.com?feed=FEED_URL
 
-The feed url should not contain the http:// prefix and should not be enclosed in quotes.
+The feed url should not be enclosed in quotes.
 
 The process is currently pretty slow and you should recieve the json in about 15 seconds.
+
+Using Karzetek
+----------------
+Within this repo, index.py handles the online API service. The actual code dealing with finding recommendations is isolated to the karzetek.py file.
+
+To use it:
+
+    from karzetek import Karzetek
+    karzetek = Karzetek()
+
+to get recommendations from a url:
+
+    recommendations = karzetek.url_recommendations(url) 
+
+to get recommendations from a feed url:
+
+    recommendations = karzetek.feed_recommendations(feed_url)
 
 Helping Out
 ----------------
@@ -36,7 +55,7 @@ To help out:
  1. Change documentation to reflect your changes
  1. Make a pull request
 
-TODO
+Todo
 ----------------
 More help is always welcome. Here are some outlined goals:
  1. More documentation - Always needed
@@ -48,5 +67,8 @@ More help is always welcome. Here are some outlined goals:
 
 Version
 ----------------
+0.0.2
+added basic database records
+
 0.0.1
  * Initial Commit
