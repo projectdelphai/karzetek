@@ -54,7 +54,7 @@ class Karzetek:
     recommendations=[]
     feed = feedparser.parse(rss_link)
     for article in feed.entries[:5]:
-      for dict in self.url_recommendations(article.link)
+      for dict in self.url_recommendations(article.link):
         if dict not in recommendations:
           recommendations.append(dict)
     print(time.ctime())
