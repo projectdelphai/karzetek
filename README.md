@@ -67,6 +67,10 @@ More help is always welcome. Here are some outlined goals:
 
 Version
 ----------------
+0.0.2-1
+refactored
+removed duplicated recommendations
+
 0.0.2
 added basic database records
 

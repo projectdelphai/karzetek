@@ -15,51 +15,48 @@ class Karzetek:
     if "DATABASE_URL" not in os.environ:
       os.environ["DATABASE_URL"] = 'postgres://localhost/karzetek_development'
     url = urlparse(os.environ["DATABASE_URL"])
-    conn = psycopg2.connect(
-        database=url.path[1:],
-        user=url.username,
-        password=url.password,
-        host=url.hostname,
-        port=url.port
-        )
+    conn = psycopg2.connect(database=url.path[1:], user=url.username, password=url.password, host=url.hostname, port=url.port)
     return conn
 
-  def db_close(self,conn):
-    conn.close()
-
-  def db_add(self,conn,url,feed,title):
+  def db_add(self,data):
+    conn = self.db_connect()
     cur = conn.cursor()
     SQL = "INSERT INTO feeds(url,feed,title) VALUES(%s,%s,%s);"
-    data = (url,feed,title)
+    data = (data['url'],data['feed'],data['title'])
     cur.execute(SQL, data)
     conn.commit()
+    conn.close()
+
+  def db_check(self,url):
+    conn = self.db_connect()
+    cur = conn.cursor()
+    cur.execute("SELECT url,feed,title FROM feeds WHERE url='%s'" % (url))
+    response = cur.fetchall()
+    conn.close()
+    return response
 
   def url_recommendations(self,url):
     rss_feeds=[]
     links = self.get_hyperlinks(url)
-    print(time.ctime())
-    conn = self.db_connect()
-    cur = conn.cursor()
     for link in links:
-      cur.execute("SELECT * FROM feeds WHERE url='%s'" % (link))
-      response = cur.fetchall()
+      response = self.db_check(link)
       if len(response) == 1:
-        if not response[0][1] == None:
-          rss_feed = { "url": response[0][1], "feed": response[0][2], "title": response[0][3] }
+        rss_feed = { "url": response[0][0], "feed": response[0][1], "title": response[0][2] }
       else:
         rss_feed = self.get_rss(link)
-        self.db_add(conn,rss_feed['url'],rss_feed['feed'],rss_feed['title'])
+        self.db_add(rss_feed)
       if not rss_feed['feed'] == None:
         rss_feeds.append(rss_feed)
-    self.db_close(conn)
     return rss_feeds
  
   def feed_recommendations(self,rss_link):
     print(time.ctime())
     recommendations=[]
     feed = feedparser.parse(rss_link)
-    for entry in feed.entries[:1]:
-      recommendations = recommendations + self.url_recommendations(entry.link)
+    for article in feed.entries[:5]:
+      for dict in self.url_recommendations(article.link)
+        if dict not in recommendations:
+          recommendations.append(dict)
     print(time.ctime())
     return recommendations
   
@@ -75,12 +72,13 @@ class Karzetek:
     return links
 
   def get_rss(self,url):
+    dictionary = { "title": None, "url": url, "feed": None }
     try:
       html = urllib.request.urlopen(url, timeout = 1)
     except:
-      return { "title": None, "url": url, "feed": None }
+      return dictionary
     soup = BeautifulSoup(html, "lxml", parse_only=SoupStrainer('head'))
     for a in soup.findAll('link', {'rel' : 'alternate'}, href=True, type=True ):
       if a['rel'] == ['alternate'] and a['href'].startswith('http'):
-        return { "title": ' '.join(soup.title.text.split()), "url": url, "feed": a['href'] }
-    return { "title": None, "url": url, "feed": None }
+        return { "title": str(soup.title.text), "url": url, "feed": a['href'] }
+    return dictionary
