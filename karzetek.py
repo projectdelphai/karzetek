@@ -35,18 +35,19 @@ class Karzetek:
     conn.close()
     return response
 
-  def url_recommendations(self,url):
+  def url_recommendations(self,url,retrieved_urls):
     rss_feeds=[]
     links = self.get_hyperlinks(url)
     for link in links:
-      response = self.db_check(link)
-      if len(response) == 1:
-        rss_feed = { "url": response[0][0], "feed": response[0][1], "title": response[0][2] }
-      else:
-        rss_feed = self.get_rss(link)
-        self.db_add(rss_feed)
-      if not rss_feed['feed'] == None:
-        rss_feeds.append(rss_feed)
+      if link not in retrieved_urls:
+        response = self.db_check(link)
+        if len(response) == 1:
+          rss_feed = { "url": response[0][0], "feed": response[0][1], "title": response[0][2] }
+        else:
+          rss_feed = self.get_rss(link)
+          self.db_add(rss_feed)
+        if not rss_feed['feed'] == None:
+          rss_feeds.append(rss_feed)
     return rss_feeds
  
   def feed_recommendations(self,rss_link):
@@ -54,9 +55,9 @@ class Karzetek:
     recommendations=[]
     feed = feedparser.parse(rss_link)
     for article in feed.entries[:5]:
-      for dict in self.url_recommendations(article.link):
-        if dict not in recommendations:
-          recommendations.append(dict)
+      retrieved_urls = [ rss_dict['url'] for rss_dict in recommendations ]
+      for dict in self.url_recommendations(article.link,retrieved_urls):
+        recommendations.append(dict)
     print(time.ctime())
     return recommendations
   
