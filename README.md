@@ -28,7 +28,7 @@ The API itself is hosted on karzetek.heroku.com. To get recommendations, the for
 
 The feed url should not be enclosed in quotes.
 
-The process is currently pretty slow and you should recieve the json in about 15 seconds.
+The process is currently pretty slow and you should recieve the json in about 15 seconds. However, it does have caching, so the more karzetek is used the more likely your response will be 4-6 seconds.
 
 Using Karzetek
 ----------------
