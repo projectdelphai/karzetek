@@ -73,6 +73,7 @@ class Karzetek:
     return links
 
   def get_rss(self,url):
+    print(url)
     dictionary = { "title": None, "url": url, "feed": None }
     try:
       html = urllib.request.urlopen(url, timeout = 1)
@@ -81,5 +82,8 @@ class Karzetek:
     soup = BeautifulSoup(html, "lxml", parse_only=SoupStrainer('head'))
     for a in soup.findAll('link', {'rel' : 'alternate'}, href=True, type=True ):
       if a['rel'] == ['alternate'] and a['href'].startswith('http'):
-        return { "title": str(soup.title.text), "url": url, "feed": a['href'] }
+          try:
+              return { "title": str(soup.title.text), "url": url, "feed": a['href'] }
+          except:
+              return dictionary
     return dictionary

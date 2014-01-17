@@ -10,7 +10,7 @@ app = Flask(__name__)
 def index():
   input = request.args.get('feed', '')
   if len(input) < 1:
-    return "No input"
+    return "No Input. Refresh this page with '?feed=<feedURL>' appended at the end"
   else:
     recommended_feeds = Karzetek().feed_recommendations(input)
     return str(recommended_feeds)
